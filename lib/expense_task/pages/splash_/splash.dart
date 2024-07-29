@@ -54,11 +54,11 @@ class _SplashState extends State<Splash> {
             ),
             const SizedBox(height: 20),
             const Text(
-              'Budget App',
+              'Expense App',
               style: TextStyle(
                 fontSize: 32,
                 fontWeight: FontWeight.w700,
-                color: Colors.grey,
+                color: Colors.green,
               ),
             ),
           ],

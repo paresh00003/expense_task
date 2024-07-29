@@ -4,7 +4,7 @@ import 'package:sql_task_expense/expense_task/pages/splash_/splash.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-//  await PrefrenceManager.init();
+
   runApp(MyApp());
 }
 

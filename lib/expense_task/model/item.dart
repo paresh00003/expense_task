@@ -1,10 +1,10 @@
-// item.dart
 class Item {
   final int? itemId;
   final String itemName;
   final double itemPrice;
   final String itemDescription;
   final int userId;
+  final DateTime createdAt;
 
   Item({
     this.itemId,
@@ -12,6 +12,7 @@ class Item {
     required this.itemPrice,
     required this.itemDescription,
     required this.userId,
+    required this.createdAt,
   });
 
   Map<String, dynamic> toMap() {
@@ -21,6 +22,7 @@ class Item {
       'item_price': itemPrice,
       'item_description': itemDescription,
       'user_id': userId,
+      'created_at': createdAt.toIso8601String(),
     };
   }
 
@@ -31,6 +33,7 @@ class Item {
       itemPrice: map['item_price'],
       itemDescription: map['item_description'],
       userId: map['user_id'],
+      createdAt: DateTime.parse(map['created_at']),
     );
   }
 }

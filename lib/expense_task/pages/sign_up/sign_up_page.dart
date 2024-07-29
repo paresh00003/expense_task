@@ -12,6 +12,7 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmController = TextEditingController();
@@ -47,7 +48,7 @@ class _SignUpPageState extends State<SignUpPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: sizeForHeight / 8.0), // Adjusted for better spacing
+                  SizedBox(height: sizeForHeight / 8.0),
                   Center(
                     child: Text(
                       'Sign Up',
@@ -232,6 +233,7 @@ class _SignUpPageState extends State<SignUpPage> {
   }
 
   void _signUp(BuildContext context) async {
+
     String email = _emailController.text;
     String password = _passwordController.text;
     String confirmPassword = _confirmController.text;
@@ -249,14 +251,14 @@ class _SignUpPageState extends State<SignUpPage> {
 
     User newUser = User(email: email, password: password);
 
-    DbHelper dbHelper = DbHelper(); // Ensure that the instance is created
+    DbHelper dbHelper = DbHelper();
     int userId = await dbHelper.insertUser(newUser);
 
     await PrefrenceManager.statusChange(true, userId);
 
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => Homescreen()),
+      MaterialPageRoute(builder: (context) => LoginPage()),
           (route) => false,
     );
   }

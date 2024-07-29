@@ -4,7 +4,9 @@ import '../../model/item.dart';
 import '../../shared_prefrance/prefrance.dart';
 
 class ExpensePage extends StatefulWidget {
-  const ExpensePage({Key? key}) : super(key: key);
+  final Item? item;
+
+  const ExpensePage({Key? key, this.item}) : super(key: key);
 
   @override
   State<ExpensePage> createState() => _ExpensePageState();
@@ -21,6 +23,11 @@ class _ExpensePageState extends State<ExpensePage> {
   void initState() {
     super.initState();
     _loadUserId();
+    if (widget.item != null) {
+      _nameController.text = widget.item!.itemName;
+      _priceController.text = widget.item!.itemPrice.toString();
+      _descriptionController.text = widget.item!.itemDescription;
+    }
   }
 
   Future<void> _loadUserId() async {
@@ -36,26 +43,31 @@ class _ExpensePageState extends State<ExpensePage> {
     }
 
     final item = Item(
+      itemId: widget.item?.itemId,
       itemName: _nameController.text,
       itemPrice: double.tryParse(_priceController.text) ?? 0.0,
       itemDescription: _descriptionController.text,
       userId: _userId,
+      createdAt: widget.item?.createdAt ?? DateTime.now(),
     );
 
     try {
-      await _dbHelper.insertItem(item);
-      Navigator.pop(context, true); // Return to Homescreen with refresh flag
+      if (widget.item == null) {
+        await _dbHelper.insertItem(item);
+      } else {
+        await _dbHelper.updateItem(item);
+      }
+      Navigator.pop(context, true);
 
-      // Show SnackBar after item is successfully added
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Text('Item added successfully!'),
+          content: Text(widget.item == null ? 'Item added successfully!' : 'Item updated successfully!'),
           backgroundColor: Colors.green,
           duration: const Duration(seconds: 2),
         ),
       );
     } catch (e) {
-      _showErrorDialog('Failed to add item');
+      _showErrorDialog(widget.item == null ? 'Failed to add item' : 'Failed to update item');
     }
   }
 
@@ -83,35 +95,37 @@ class _ExpensePageState extends State<ExpensePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Item'),
+        title: Text(widget.item == null ? 'Add Item' : 'Edit Item'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Item Name'),
-            ),
-            TextField(
-              controller: _priceController,
-              decoration: const InputDecoration(labelText: 'Item Price'),
-              keyboardType: TextInputType.number,
-            ),
-            TextField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(labelText: 'Item Description'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _addItem,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.lightBlue,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Item Name'),
               ),
-              child: const Text('Add Item', style: TextStyle(color: Colors.white)),
-            ),
-          ],
+              TextField(
+                controller: _priceController,
+                decoration: const InputDecoration(labelText: 'Item Price'),
+                keyboardType: TextInputType.number,
+              ),
+              TextField(
+                controller: _descriptionController,
+                decoration: const InputDecoration(labelText: 'Item Description'),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _addItem,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.lightBlue,
+                ),
+                child: Text(widget.item == null ? 'Add Item' : 'Update Item', style: const TextStyle(color: Colors.white)),
+              ),
+            ],
+          ),
         ),
       ),
     );

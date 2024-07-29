@@ -12,12 +12,15 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _obscurePassword = true; // State variable for password visibility
+
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
+
     var sizeForHeight = MediaQuery.of(context).size.height;
     var sizeForWidth = MediaQuery.of(context).size.width;
 

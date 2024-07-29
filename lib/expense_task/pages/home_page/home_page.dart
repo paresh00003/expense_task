@@ -70,71 +70,6 @@ class _HomescreenState extends State<Homescreen> {
     );
   }
 
-  void _showEditItemDialog(Item item) async {
-    final nameController = TextEditingController(text: item.itemName);
-    final priceController = TextEditingController(text: item.itemPrice.toString());
-    final descriptionController = TextEditingController(text: item.itemDescription);
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Edit Item'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                controller: nameController,
-                decoration: const InputDecoration(labelText: 'Item Name'),
-              ),
-              TextField(
-                controller: priceController,
-                decoration: const InputDecoration(labelText: 'Item Price'),
-                keyboardType: TextInputType.number,
-              ),
-              TextField(
-                controller: descriptionController,
-                decoration: const InputDecoration(labelText: 'Item Description'),
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                final updatedItem = Item(
-                  itemId: item.itemId,
-                  itemName: nameController.text,
-                  itemPrice: double.tryParse(priceController.text) ?? item.itemPrice,
-                  itemDescription: descriptionController.text,
-                  userId: item.userId,
-                );
-                await _dbHelper.updateItem(updatedItem);
-                Navigator.pop(context);
-
-                // Show SnackBar for successful update
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('Item updated successfully!'),
-                    backgroundColor: Colors.green,
-                    duration: const Duration(seconds: 2),
-                  ),
-                );
-                _fetchItems(); // Refresh list
-              },
-              child: const Text('Save'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void _showDeleteConfirmationDialog(Item item) {
     showDialog(
       context: context,
@@ -154,7 +89,6 @@ class _HomescreenState extends State<Homescreen> {
                 await _dbHelper.deleteItem(item.itemId!);
                 Navigator.pop(context);
 
-                // Show SnackBar for successful deletion
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: const Text('Item deleted successfully!'),
@@ -162,7 +96,7 @@ class _HomescreenState extends State<Homescreen> {
                     duration: const Duration(seconds: 2),
                   ),
                 );
-                _fetchItems(); // Refresh list
+                _fetchItems();
               },
               child: const Text('Delete'),
             ),
@@ -183,7 +117,7 @@ class _HomescreenState extends State<Homescreen> {
           );
 
           if (result == true) {
-            _fetchItems(); // Refresh items after adding
+            _fetchItems();
           }
         },
         child: const Icon(
@@ -209,7 +143,7 @@ class _HomescreenState extends State<Homescreen> {
           final item = _items[index];
           return Card(
             child: ListTile(
-              leading: Icon(Icons.shopping_bag, color: Colors.blue),
+              leading: const Icon(Icons.shopping_bag, color: Colors.blue),
               title: Text(item.itemName),
               subtitle: Text('${item.itemPrice} - ${item.itemDescription}'),
               trailing: Row(
@@ -217,7 +151,18 @@ class _HomescreenState extends State<Homescreen> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.edit, color: Colors.orange),
-                    onPressed: () => _showEditItemDialog(item),
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ExpensePage(item: item),
+                        ),
+                      );
+
+                      if (result == true) {
+                        _fetchItems();
+                      }
+                    },
                   ),
                   IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
@@ -225,7 +170,6 @@ class _HomescreenState extends State<Homescreen> {
                   ),
                 ],
               ),
-              onTap: () => _showEditItemDialog(item),
             ),
           );
         },

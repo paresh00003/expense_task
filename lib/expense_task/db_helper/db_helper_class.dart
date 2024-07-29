@@ -23,19 +23,25 @@ class DbHelper {
     String path = join(await getDatabasesPath(), 'app_database.db');
     return openDatabase(
       path,
-      onCreate: (db, version) {
-        db.execute(
+      version: 2,
+      onCreate: (db, version) async {
+        await db.execute(
           "CREATE TABLE users(id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT UNIQUE, password TEXT)",
         );
-        db.execute(
-          "CREATE TABLE items(item_id INTEGER PRIMARY KEY AUTOINCREMENT, item_name TEXT, item_price REAL, item_description TEXT, user_id INTEGER, FOREIGN KEY(user_id) REFERENCES users(id))",
+        await db.execute(
+          "CREATE TABLE items(item_id INTEGER PRIMARY KEY AUTOINCREMENT, item_name TEXT, item_price REAL, item_description TEXT, user_id INTEGER, created_at TEXT, FOREIGN KEY(user_id) REFERENCES users(id))",
         );
       },
-      version: 1,
+      onUpgrade: (db, oldVersion, newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute(
+            "ALTER TABLE items ADD COLUMN created_at TEXT",
+          );
+        }
+      },
     );
   }
 
-  // User operations
   Future<int> insertUser(User user) async {
     final db = await database;
     return await db.insert('users', user.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);
@@ -55,7 +61,6 @@ class DbHelper {
     return null;
   }
 
-  // Item operations
   Future<int> insertItem(Item item) async {
     final db = await database;
     return await db.insert('items', item.toMap(), conflictAlgorithm: ConflictAlgorithm.replace);

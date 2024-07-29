@@ -1,6 +1,8 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PrefrenceManager {
+
+
   static const String _keyIsLoggedIn = 'isLoggedIn';
   static const String _keyUserId = 'userId';
 
